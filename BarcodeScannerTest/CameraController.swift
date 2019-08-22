@@ -21,6 +21,20 @@ final class CameraController: NSObject {
     
     private let position: AVCaptureDevice.Position = .back
     private var cameraDevice: AVCaptureDevice?
+    private var allMetadataOutObjectTypes: [AVMetadataObject.ObjectType] = [.ean8,
+                                          .ean13,
+                                          .pdf417,
+                                          .aztec,
+                                          .code128,
+                                          .code39,
+                                          .code39Mod43,
+                                          .code93,
+                                          .dataMatrix,
+                                          .face,
+                                          .interleaved2of5,
+                                          .itf14,
+                                          .qr,
+                                          .upce]
     
     let previewLayer: AVCaptureVideoPreviewLayer
     
@@ -81,26 +95,29 @@ private extension CameraController {
     func configureSession() {
         queue.async {
             
-            session.sessionPreset = .photo
+            self.session.sessionPreset = .photo
+            
+            self.cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: self.position)
+            
+            if let cameraDevice = self.cameraDevice, let input = try? AVCaptureDeviceInput(device: cameraDevice), self.session.canAddInput(input) {
+                self.session.addInput(input)
+            }
             
             self.cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: self.position)
             
             if self.session.canAddOutput(self.metadataOutput) {
                 self.session.addOutput(self.metadataOutput)
-                self.metadataOutput.metadataObjectTypes = [.ean8,
-                                                           .ean13,
-                                                           .pdf417,
-                                                           .aztec,
-                                                           .code128,
-                                                           .code39,
-                                                           .code39Mod43,
-                                                           .code93,
-                                                           .dataMatrix,
-                                                           .face,
-                                                           .interleaved2of5,
-                                                           .itf14,
-                                                           .qr,
-                                                           .upce]
+                self.metadataOutput.setMetadataObjectsDelegate(self, queue: self.queue)
+                
+                var availableOutputTypes: [AVMetadataObject.ObjectType] = []
+                for outputType in self.allMetadataOutObjectTypes {
+                    if self.metadataOutput.availableMetadataObjectTypes.contains(outputType) {
+                        availableOutputTypes.append(outputType)
+                    }
+                }
+                
+                self.metadataOutput.metadataObjectTypes = [.code128]
+                self.metadataOutput.rectOfInterest = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 300)
             }
             
             self.updateOrientation()

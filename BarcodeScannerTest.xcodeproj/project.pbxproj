@@ -14,6 +14,7 @@
 		17848C07230EE1900087513E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 17848C05230EE1900087513E /* LaunchScreen.storyboard */; };
 		17848C11230EE5140087513E /* UIViewController+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17848C10230EE5140087513E /* UIViewController+Alert.swift */; };
 		17848C13230EF01A0087513E /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17848C12230EF01A0087513E /* CameraController.swift */; };
+		17EFF468230F11A3006771C9 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EFF467230F11A3006771C9 /* PreviewView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		17848C08230EE1900087513E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		17848C10230EE5140087513E /* UIViewController+Alert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Alert.swift"; sourceTree = "<group>"; };
 		17848C12230EF01A0087513E /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
+		17EFF467230F11A3006771C9 /* PreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,7 @@
 				17848C03230EE1900087513E /* Assets.xcassets */,
 				17848C05230EE1900087513E /* LaunchScreen.storyboard */,
 				17848C08230EE1900087513E /* Info.plist */,
+				17EFF467230F11A3006771C9 /* PreviewView.swift */,
 				17848C12230EF01A0087513E /* CameraController.swift */,
 			);
 			path = BarcodeScannerTest;
@@ -141,6 +144,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				17EFF468230F11A3006771C9 /* PreviewView.swift in Sources */,
 				17848BFF230EE18F0087513E /* ViewController.swift in Sources */,
 				17848BFD230EE18F0087513E /* AppDelegate.swift in Sources */,
 				17848C13230EF01A0087513E /* CameraController.swift in Sources */,
@@ -291,7 +295,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = B3SRWNJWWE;
+				DEVELOPMENT_TEAM = 24F93FXX74;
 				INFOPLIST_FILE = BarcodeScannerTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -309,7 +313,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = B3SRWNJWWE;
+				DEVELOPMENT_TEAM = 24F93FXX74;
 				INFOPLIST_FILE = BarcodeScannerTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
