@@ -67,11 +67,6 @@ final class CameraController: NSObject {
         default:
             showAccessDeniedMessage()
         }
-        
-        // Without this call all `UIDevice.current.orientation` responses will be 0
-        UIDevice.current.beginGeneratingDeviceOrientationNotifications()
-        NotificationCenter.default.addObserver(self, selector: #selector(orientationDidChange(_:)),
-                                               name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
     deinit {
@@ -89,18 +84,65 @@ final class CameraController: NSObject {
             self.session.stopRunning()
         }
     }
+    
+    func tapToFocus(tap: UITapGestureRecognizer, in view: UIView) {
+        let touchPoint:CGPoint = tap.location(in: view)
+        let convertedPoint:CGPoint = previewLayer.captureDevicePointConverted(fromLayerPoint: touchPoint)
+        
+        guard let cameraDevice = cameraDevice else {
+            return
+        }
+        
+        if cameraDevice.isFocusPointOfInterestSupported && cameraDevice.isFocusModeSupported(AVCaptureDevice.FocusMode.autoFocus){
+            do {
+                try cameraDevice.lockForConfiguration()
+                cameraDevice.focusPointOfInterest = convertedPoint
+                cameraDevice.focusMode = .autoFocus
+                cameraDevice.unlockForConfiguration()
+                
+                DispatchQueue.global().asyncAfter(deadline: .now() + 1.0, execute: {
+                    do {
+                        try cameraDevice.lockForConfiguration()
+                        cameraDevice.focusMode = .continuousAutoFocus
+                        cameraDevice.unlockForConfiguration()
+                    } catch {
+                        print(error)
+                    }
+                })
+                
+            } catch let error {
+                print(error)
+            }
+        }
+    }
+    
+    func setRectOfInterest(_ rect: CGRect) {
+        metadataOutput.rectOfInterest = rect
+    }
 }
 
 private extension CameraController {
     func configureSession() {
         queue.async {
             
-            self.session.sessionPreset = .photo
+            self.session.sessionPreset = .inputPriority
             
             self.cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: self.position)
             
             if let cameraDevice = self.cameraDevice, let input = try? AVCaptureDeviceInput(device: cameraDevice), self.session.canAddInput(input) {
                 self.session.addInput(input)
+                
+                let captureSessionCenter = CGPoint(x: self.previewLayer.frame.midX, y: self.previewLayer.frame.midY)
+                let convertedPoint = self.previewLayer.layerPointConverted(fromCaptureDevicePoint: captureSessionCenter)
+                
+                do {
+                    try cameraDevice.lockForConfiguration()
+                    cameraDevice.focusMode = .continuousAutoFocus
+                    cameraDevice.focusPointOfInterest = convertedPoint
+                    cameraDevice.unlockForConfiguration()
+                } catch {
+                    print(error)
+                }
             }
             
             self.cameraDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: self.position)
@@ -110,35 +152,19 @@ private extension CameraController {
                 self.metadataOutput.setMetadataObjectsDelegate(self, queue: self.queue)
                 
                 var availableOutputTypes: [AVMetadataObject.ObjectType] = []
+                
                 for outputType in self.allMetadataOutObjectTypes {
                     if self.metadataOutput.availableMetadataObjectTypes.contains(outputType) {
                         availableOutputTypes.append(outputType)
                     }
                 }
                 
-                self.metadataOutput.metadataObjectTypes = [.code128]
-                self.metadataOutput.rectOfInterest = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 300)
+                self.metadataOutput.metadataObjectTypes = availableOutputTypes
             }
-            
-            self.updateOrientation()
         }
-    }
-    
-    func updateOrientation() {
-        dispatchPrecondition(condition: .onQueue(queue))
-        guard let orientation = AVCaptureVideoOrientation(rawValue: UIDevice.current.orientation.rawValue) else { return }
-        self.previewLayer.connection?.videoOrientation = orientation
     }
     
     func showAccessDeniedMessage() {
-        
-    }
-    
-    @objc
-    func orientationDidChange(_ notification: Notification) {
-        queue.async {
-            self.updateOrientation()
-        }
     }
 }
 

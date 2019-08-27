@@ -12,6 +12,11 @@ import AVKit
 class ViewController: UIViewController  {
     let cameraController = CameraController()
     
+    lazy var tap: UITapGestureRecognizer = {
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(tap:)))
+        return gesture
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     
@@ -20,16 +25,30 @@ class ViewController: UIViewController  {
         
         view.layer.addSublayer(cameraController.previewLayer)
         
-        let overlay = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 300))
-        overlay.layer.borderColor = UIColor.green.cgColor
-        overlay.layer.borderWidth = 15
+        view.addGestureRecognizer(tap)
         
-        view.addSubview(overlay)
+        let center = CGPoint(x: view.frame.midX, y: view.frame.midY)
+        let rect = CGRect(x: 0, y: 0, width: 300, height: 200)
+        
+        let boxView = UIView(frame: rect)
+        boxView.center = center
+        boxView.layer.borderColor = UIColor.green.cgColor
+        boxView.layer.borderWidth = 15
+
+        view.addSubview(boxView)
+        cameraController.setRectOfInterest(rect)
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         cameraController.previewLayer.frame = view.bounds
+    }
+}
+
+private extension ViewController {
+    @objc
+    func handleTap(tap: UITapGestureRecognizer) {
+        cameraController.tapToFocus(tap: tap, in: view)
     }
 }
 
